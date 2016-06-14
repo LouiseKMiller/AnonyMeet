@@ -29,6 +29,9 @@
 				<input id="show-listing" type="button" value="show listings">
 				<input id="hide-listing" type="button" value="hide listings">
 			</div>
+			<div>
+				<h3 id="result"></h3>
+			</div>
 		</div>
 	</div>
 		<div id='map'></div>
@@ -41,11 +44,17 @@
 	<script type="text/javascript" src="assets/javascript/app.js"></script>
 
 
+<!-- GOOGLE MAP API CALL.  CHANGED FROM ASYNC DEFER TO
+A SYNCHRONOUS? CALL.
+FOR NOW, THE CALL INCLUDES THE FOLLOWING LIBRARIES: GEOMETRY, DRAWING AND PLACES -->
 
-
-	<script async defer
-		src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDHLAzU1_hkV_IcuSPAhH61fqAi96I0V4c&v=3&callback=initMap">
+	<script type="text/javascript"
+		src="https://maps.googleapis.com/maps/api/js?libraries=geometry,drawing,places&key=AIzaSyDHLAzU1_hkV_IcuSPAhH61fqAi96I0V4c&v=3&callback=initMap">
 	</script>
+
+<!-- 	<script async defer
+		src="https://maps.googleapis.com/maps/api/js?libraries=geometry&key=AIzaSyDHLAzU1_hkV_IcuSPAhH61fqAi96I0V4c&v=3&callback=initMap">
+	</script> -->
 
 </body>
 </html>
