@@ -38,7 +38,7 @@ function initMap() {
 
 	map = new google.maps.Map(document.getElementById('map'), {
 		center: {lat: 30.2672, lng: -97.7431},
-		zoom: 13,
+		zoom: 18,
 		styles: styles,
 		mapTypeControl: false
 	});
@@ -121,6 +121,8 @@ function initMap() {
 		//  Need to figure out how to match up the top 5 for
 		//  each user (personA and personB)
 
+		// create LatLngBounds instance that capture SW and NE corners of viewport
+			var bounds = new google.maps.LatLngBounds();
 			for (var i=0; i < results.length; i++) {
 				var place = results[i];
 				// we suse the spots object to save the information
@@ -135,7 +137,10 @@ function initMap() {
 				// *** HECTOR - I'm hoping that there is one to one correspondence between the spots object and the locations array.  Is there a better way of doing this?  Some sort of array mapping?
 				locations.push(place.geometry.location);
 				createMarker(results[i]);
+				// extend boundaries of map for each marker
+				bounds.extend(place.geometry.location);
 			}
+			map.fitBounds(bounds);
 
 		}
 		else console.log (status);
@@ -162,6 +167,7 @@ function initMap() {
 			animation: google.maps.Animation.DROP,
 	//		id: i
 			});
+
 			// create an onclick event to open an infowindow at each marker
 			marker.addListener('click', function(){
 				populateInfoWindow(this,largeInfowindow);
@@ -170,6 +176,8 @@ function initMap() {
 	//			infowindow.setContent(place.name);
 	//			infowindow.open(map, this);
 	//		});
+	// ***NOTE - any need to push these markers into an array?
+	//
 
 			marker.addListener("mouseover", function(){
 				this.setIcon(highlightedIcon);
@@ -223,15 +231,26 @@ function initMap() {
 						var to = destinations[j];
 
 						var newRow = $("<tr>");
-
-						newRow.append("<td>" + to+"</td>");
-						newRow.append("<td>"+distance+"</td>");
-						newRow.append("<td>"+duration+"</td>");
+						createNewRow();
+						newRow.find('#name').html(spots[j].name);
+						newRow.find('#address').html(to);
+						newRow.find('#distYou').html(distance);
+						newRow.find('#timeYou').html(duration);
 						$('#tableDiv').append(newRow);
 					}
 				}
-				$('#yourLocDiv').append("origin: " + from+"<br>");
+				$('#yourLocDiv').append("Your Location: " + from+"<br>");
+
+				function createNewRow(){
+					newRow.append("<td id='name'></td>")
+					newRow.append("<td id='address'></td>")
+					newRow.append("<td id='distYou'></td>")
+					newRow.append("<td id='timeYou'></td>")
+					newRow.append("<td id='distThem'></td>")
+					newRow.append("<td id='timeThem'></td>")
+				}
 			}
+
 			else console.log (status);
 		};
 	}; //end of doDistanceMatrix
