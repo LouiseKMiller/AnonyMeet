@@ -6,7 +6,7 @@
 var map;
 
 var spots = [];
-
+var locations = [];
 
 function initMap() {
 
@@ -80,8 +80,14 @@ function initMap() {
 
 
 
-	// PLACES SERVICE - ET NEARBY PLACES
-	//
+	// PLACES SERVICE - GET NEARBY PLACES
+	// using Google Maps Places service with Nearby Search Request
+	// Can specify type of places and radius (in meters) from specified location
+	// Specified location should be midpoint between personA and personB
+	// You get a result of 20 places
+	// Result stored in local 'spots' object
+	// ** will need to store in firebase as well ??
+	// 
 
 	var serviceP = new google.maps.places.PlacesService(map);
 	var midpoint = new google.maps.LatLng(30.2600, -97.7400);
@@ -91,28 +97,58 @@ function initMap() {
 		types: ['restaurant']
 	};
 
+	// API call through Google Places JavaScript Library
 
 	serviceP.nearbySearch(request, findPlaces);
+
+	// callback function for Places API call
 
 	function findPlaces (results, status){
 		if (status == google.maps.places.PlacesServiceStatus.OK) {
 
-// I JSON stringify and then parse so you can see the lat and long values
+//  DON'T KNOW IF WE NEED THIS.  DISCARD AT END IF NOT NEEDED
+//     JSON stringify and then parse so you can see the lat and long values
 //		var placesResult = JSON.stringify(results);
 //		yourNearbyLocations = JSON.parse(placesResult); 
 //		console.log (yourNearbyLocations);
 //		$('#result').append("places: " + placesResult)
 
+		// for each place found, store results in 'spots' object
+		// and create a marker and place marker on the map
+		// NOTE:  20 is probably too many.
+		//  Maybe we should limit it to the top 5??
+		//  Then create markers for just those top 5 ???
+		//  Need to figure out how to match up the top 5 for
+		//  each user (personA and personB)
+
 			for (var i=0; i < results.length; i++) {
 				var place = results[i];
-				var position = place.geometry.location;
-				var title = place.name;
-				spots.push(position);
+				// we suse the spots object to save the information
+				// used for the html table
+				spots.push({
+					name: place.name,
+					position: place.geometry.location,
+					address: place.vicinity
+					});
+				// Have to create a separate array with just
+				// the locations for use in the distance matrix
+				// *** HECTOR - I'm hoping that there is one to one correspondence between the spots object and the locations array.  Is there a better way of doing this?  Some sort of array mapping?
+				locations.push(place.geometry.location);
 				createMarker(results[i]);
 			}
 
-		};
-	doDistanceMatrix();
+		}
+		else console.log (status);
+
+	//  now that you have the places stored in the 'spots' object,
+	//  find the distance from each spot to personA 
+	//  Once we use Firebase, we can change personA to User
+	//  ** NOTE FOR HECTOR - I can't figure out how to save the 'spots'
+	//  object data	in a way that I can access it oustide of the PLACES
+	//  callback function.  What am I doing wrong?  Or is that just
+	//  the way Google Map APIs work?
+
+		doDistanceMatrix();
 	};
 
 
@@ -163,7 +199,7 @@ function initMap() {
 		serviceD.getDistanceMatrix(
 			{ 
 			origins: [locationPersonA],
-			destinations: spots,
+			destinations: locations,
 			travelMode: google.maps.TravelMode.DRIVING,
 			// transitOptions: TransitOptions,
 			// drivingOptions: DrivingOptions,
@@ -185,12 +221,16 @@ function initMap() {
 						var duration = element.duration.text;
 						var from = origins[i];
 						var to = destinations[j];
-						$('#result').append("origin: " + from+"<br>");
-						$('#result').append("destination: " + to+"<br>");
-						$('#result').append("distance: "+distance+"<br>");
-						$('#result').append("duration: "+duration+"<br>");
+
+						var newRow = $("<tr>");
+
+						newRow.append("<td>" + to+"</td>");
+						newRow.append("<td>"+distance+"</td>");
+						newRow.append("<td>"+duration+"</td>");
+						$('#tableDiv').append(newRow);
 					}
 				}
+				$('#yourLocDiv').append("origin: " + from+"<br>");
 			}
 			else console.log (status);
 		};
@@ -198,27 +238,32 @@ function initMap() {
 }  //end of initMap function
 
 $(document).ready(function(){
-// listener for user clicking on "show listing" button
 
-$('#show-listing').on("click", function(event){
-	event.preventDefault();
-	var bounds = new google.maps.LatLngBounds();
-	// extend the boundaries of the map for each marker
-	for (var i=0; i < markers.length; i++) {
-		markers[i].setMap(map);
-		bounds.extend(markers[i].position);
-	};
-	map.fitBounds(bounds);
-});
 
-// listener for user clicking on "hide listing" button
+// NOT USING THESE LISTENERS, DISCARD IF NOT NEEDED AT ALL
+//  KEEPING FOR NOW JUST IN CASE....
+//
+// listener for user clicking on "show places" button
 
-$('#hide-listing').on("click", function(event){
-	event.preventDefault();
-	for (var i=0; i < markers.length; i++) {
-		markers[i].setMap(null);
-	};
-});
+// $('#show-places').on("click", function(event){
+// 	event.preventDefault();
+// 	var bounds = new google.maps.LatLngBounds();
+// 	// extend the boundaries of the map for each marker
+// 	for (var i=0; i < markers.length; i++) {
+// 		markers[i].setMap(map);
+// 		bounds.extend(markers[i].position);
+// 	};
+// 	map.fitBounds(bounds);
+// });
+
+// listener for user clicking on "hide places" button
+
+// $('#hide-places').on("click", function(event){
+// 	event.preventDefault();
+// 	for (var i=0; i < markers.length; i++) {
+// 		markers[i].setMap(null);
+// 	};
+// });
 
 
 
