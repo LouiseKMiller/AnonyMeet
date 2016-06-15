@@ -5,6 +5,13 @@
 
 var map;
 var markers = [];
+var largeInfowindow ;
+
+//style the markers.  we use highlightedIcon
+//when user hovers over the marker
+var defaultIcon;
+var highlightedIcon;
+
 function initMap() {
 
 	var styles = [
@@ -48,12 +55,12 @@ function initMap() {
 
 	// this is the pop-up window that appears when you
 	// click on a marker
-	var largeInfowindow = new google.maps.InfoWindow();
+	largeInfowindow = new google.maps.InfoWindow();
 
 	//style the markers.  we use highlightedIcon
 	//when user hovers over the marker
-	var defaultIcon = makeMarkerIcon('0091ff');
-	var highlightedIcon = makeMarkerIcon('FFFF24');
+	defaultIcon = makeMarkerIcon('0091ff');
+	highlightedIcon = makeMarkerIcon('FFFF24');
 
 	// this loop goes through the locations array
 	// and creates a marker for each location
@@ -153,8 +160,8 @@ var destinationA = new google.maps.LatLng( 30.2615, -97.7410);
 var destinationB = new google.maps.LatLng( 30.2627, -97.7450);
 var destinationC = new google.maps.LatLng( 30.2613, -97.7510);
 
-var service = new google.maps.DistanceMatrixService();
-service.getDistanceMatrix(
+var serviceD = new google.maps.DistanceMatrixService();
+serviceD.getDistanceMatrix(
 	{ 
 	origins: [origin1, origin2, origin3],
 	destinations: [destinationA, destinationB, destinationC],
@@ -186,6 +193,52 @@ function calcMatrix (response, status){
 			}
 		}
 	}
+	else console.log (status);
 };
 
-});
+//CODE FOR PLACES SERVICE
+var serviceP = new google.maps.places.PlacesService(map);
+var request = {
+	location: origin1,
+	radius: '500',
+	types: ['store']
+};
+
+serviceP.nearbySearch(request, findPlaces);
+
+function findPlaces (results, status){
+	if (status == google.maps.places.PlacesServiceStatus.OK) {
+		for (var i=0; i < results.length; i++) {
+			var place = results[i];
+			createMarker(results[i]);
+		}
+	console.log (results);
+	var placesResult = JSON.stringify(results);
+	$('#result').append("places: " + placesResult)
+	};
+};
+
+function createMarker(place) {
+	var placeLoc = place.geometry.location;
+		//create marker per location and push into markers array
+	var marker = new google.maps.Marker({
+		position: place.geometry.location,
+		icon: defaultIcon,
+		animation: google.maps.Animation.DROP,
+//		id: i
+	});
+	// create an onclick event to open an infowindow at each marker
+	marker.addListener('click', function(){
+		infowindow.setContent(place.name);
+		infowindow.open(map, this);
+	});
+
+	marker.addListener("mouseover", function(){
+		this.setIcon(highlightedIcon);
+	});
+	marker.addListener("mouseout", function(){
+		this.setIcon(defaultIcon);
+	});
+}
+
+}); // end of document.ready
