@@ -200,6 +200,11 @@ function initMap() {
 		}
 	}
 	//CODE FOR DISTANCE MATRIX SERVICE
+	// get distance matrix information for yourLocation versus 
+	// all places returned from Places API call
+ 	//  other person will do the same thing, and then
+ 	// save the data to Firebase
+
 	function doDistanceMatrix(){
 
 		var serviceD = new google.maps.DistanceMatrixService();
@@ -230,7 +235,9 @@ function initMap() {
 						var from = origins[i];
 						var to = destinations[j];
 
+
 						var newRow = $("<tr>");
+						
 						createNewRow();
 						newRow.find('#name').html(spots[j].name);
 						newRow.find('#address').html(to);
