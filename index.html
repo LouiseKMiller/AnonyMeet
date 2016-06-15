@@ -46,7 +46,9 @@
 
 <!-- GOOGLE MAP API CALL.  CHANGED FROM ASYNC DEFER TO
 A SYNCHRONOUS? CALL.
-FOR NOW, THE CALL INCLUDES THE FOLLOWING LIBRARIES: GEOMETRY, DRAWING AND PLACES -->
+FOR NOW, THE CALL INCLUDES THE FOLLOWING LIBRARIES: GEOMETRY, DRAWING AND PLACES 
+
+"it is possible to omit the async attribute and the call back parameter.  this will cause the loading of the API to block until the API is downloaded.  This will probably slow your page load.  but it means wyou can write subsequent script tags assuming that the API is already loaded"-->
 
 	<script type="text/javascript"
 		src="https://maps.googleapis.com/maps/api/js?libraries=geometry,drawing,places&key=AIzaSyDHLAzU1_hkV_IcuSPAhH61fqAi96I0V4c&v=3&callback=initMap">
