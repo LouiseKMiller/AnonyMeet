@@ -291,6 +291,89 @@ $(document).ready(function(){
 // 	};
 // });
 
+var personAexists = false;
+var personBexists = false;
+var you = "C";
+
+var data = new Firebase("https://anonymeetut.firebaseio.com/");
+var dataPersonA = new Firebase("https://anonymeetut.firebaseio.com/personA");
+var dataPersonB = new Firebase("https://anonymeetut.firebaseio.com/personB");
+
+
+// Whenever a user clicks the start button
+$("#addressform").on("submit", function() {
+
+	event.preventDefault();
+		var yourAddress = $('#address').val().trim();
+		var yourCity = $('#city').val().trim();
+		var yourZip = $('#zip').val().trim();
+
+	// Find out if someone else is player 1 already
+	// If not, user is player 1 
+	if (personAexists == false) {
+		you = "A";
+		// Save the new player name in Firebase ref('player' + you).
+		dataPersonA.set({
+			'p1address': yourAddress,
+			'p1city': yourCity,
+			'p1zip': yourZip
+			});
+	}
+
+	// If the other person has input first, you are personB
+	// If player one and player two already taken, input form is hidden
+	//  and user would not be able to submit form
+	else if ((personAexists == true) && (personBexists == false)) {
+		you = "B";
+
+		// Save the new player name in Firebase ref('player' + you).
+		dataPersonB.set({
+			'p1address': yourAddress,
+			'p1city': yourCity,
+			'p1zip': yourZip
+			});
+
+	};
+
+	// once we have player one and player two, update FB to indicate start of turn 1
+	if (personAexists && personBexists) console.log("full");
+});  //end of submit form event handler
+
+
+// At the initial load and any change, find out if Person A exists
+dataPersonA.on("value", function(snapshot) {
+	if (snapshot.exists()) {
+		personAexists = true;
+		if ((personBexists) && you=="C") {
+			$("#statusDiv").html("<h2> You are a third wheel! </h2>");
+		}
+	}
+	else {
+		$("#statusDiv").html("<h2> waiting for person B </h2>");
+		personAexists = false;
+		$('#statusDiv').html("");
+	}
+}, function (errorObject) {
+  	console.log("The read failed: " + errorObject.code);
+});
+
+// At the initial load and any change, find out if Player 2 exists
+dataPersonB.on("value", function(snapshot) {
+	if (snapshot.exists()) {
+		personBexists = true;
+		if ((personBxists) && you == "C") {
+			$("#statusDiv").html("<h2> You are a third wheel!  </h2>");
+		}
+	}
+	else {
+		$("#statusDiv").html("<h2> waiting for person A </h2>");
+		personBexists = false;
+		$('#statusDiv').html("");
+	}
+}, function (errorObject) {
+  	console.log("The read failed: " + errorObject.code);
+});
+
 
 
 
