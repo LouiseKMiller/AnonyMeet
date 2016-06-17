@@ -1,3 +1,4 @@
+
 // AnonyMeet 
 
 //*****************************************************
@@ -308,9 +309,47 @@ var personB = {
 	zip: ""};
 
 
-// Whenever a user clicks the start button
-//  ***** will need to incorporate the user input validation 
+//  function for user input validation 
 //  
+
+var formattedaddress;
+
+function validateAddress(person) {
+    var APIKey = 'uv-4dfc13ee82fb54f7c8bd2adde6aa07f4';
+    var countryCode = 'US';
+    person.APIKey = 'uv-4dfc13ee82fb54f7c8bd2adde6aa07f4';   
+   $.ajax({
+        url: 'http://api.address-validator.net/api/verify' + "?StreetAddress=" + person.address + "&City=" + person.city + "&PostalCode=" + person.zip + "&CountryCode=" + countryCode + "&APIKey=" + person.APIKey,
+        type: 'GET',
+        data: person,
+        dataType: 'json'
+    	})
+
+   // wait until you get the response
+    .done(function(response) {
+        if (typeof(response.status) != "undefined") {
+            status = response.status;
+            formattedaddress = response.formattedaddress;
+            }
+         if (you=="A") {
+       		 dataPersonA.set({
+				'streetNumber': response.streetnumber,
+				'street': response.street,
+				'city': response.city,
+				'zip': response.postalcode
+				})
+       		};
+         if (you=="B") {
+       		 dataPersonB.set({
+				'streetNumber': response.streetnumber,
+				'street': response.street,
+				'city': response.city,
+				'zip': response.postalcode
+				})
+       		};
+
+    	});
+	};
 
 $("#addressform").on("submit", function() {
 
@@ -320,18 +359,14 @@ $("#addressform").on("submit", function() {
 	// If not, user is person A 
 	if (personAexists == false) {
 
-		//  call user input validation function here
-
-		you = "A";
 		personA.address = $('#address').val().trim();
 		personA.city = $('#city').val().trim();
 		personA.zip = $('#zip').val().trim();
-		// Save the user info in firebase.
-		dataPersonA.set({
-			'address': personA.address,
-			'city': personA.city,
-			'zip': personA.zip
-			});
+		you = "A";
+
+		//  call user input validation function here
+		// save user info in firebase
+		validateAddress(personA);
 		}
 
 	// If the other person has input first, you are person B
@@ -339,19 +374,15 @@ $("#addressform").on("submit", function() {
 	//  and user would not be able to submit form
 	else if ((personAexists == true) && (personBexists == false)) {
 
-		//  call user input validation function here
 
-		you = "B";
 		personB.address = $('#address').val().trim();
 		personB.city = $('#city').val().trim();
 		personB.zip = $('#zip').val().trim();
+		you = "B";
 
+		//  call user input validation function here
 		// Save user info in firebase.
-		dataPersonB.set({
-			'address': personB.address,
-			'city': personB.city,
-			'zip': personB.zip
-			});
+		validateAddress(personB);
 		};
 	});  //end of submit form event handler
 
@@ -366,7 +397,6 @@ dataPersonA.on("value", function(snapshot) {
 			if (personBexists) {
 				$("#statusDiv").html("");
 				personB = snapshot.val();
-				console.log (personB);
 				fbStatus.set("Start"); //start processing
 				}
 			if (!personBexists) $("#statusDiv").html("<h2> Waiting for Anonymous! </h2>");
@@ -374,7 +404,6 @@ dataPersonA.on("value", function(snapshot) {
 		case "B":
 			$("#statusDiv").html("");
 			personA = snapshot.val();
-			console.log (personA);
 
 			fbStatus.set("Start"); //start processing
 			break;
@@ -414,7 +443,6 @@ dataPersonB.on("value", function(snapshot) {
 			if (personAexists) {
 				$("#statusDiv").html(""); 
 				personA = snapshot.val();
-				console.log (personA);
 				fbStatus.set("Start"); //start processing
 				};
 			if (!personAexists) $("#statusDiv").html("<h2> Waiting for Anonymous! </h2>");
@@ -422,7 +450,6 @@ dataPersonB.on("value", function(snapshot) {
 		case "A":
 			$("#statusDiv").html("");
 			personB = snapshot.val();
-			console.log (personB);
 			fbStatus.set("Start"); //start processing
 			break;
 		case "C":
