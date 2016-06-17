@@ -298,45 +298,64 @@ var you = "C";
 var data = new Firebase("https://anonymeetut.firebaseio.com/");
 var dataPersonA = new Firebase("https://anonymeetut.firebaseio.com/personA");
 var dataPersonB = new Firebase("https://anonymeetut.firebaseio.com/personB");
+var fbStatus = new Firebase("https://anonymeetut.firebaseio.com/status");
+
+var personA = {
+	address: "",
+	city: "",
+	zip: ""};
+
+var personB = {
+	address: "",
+	city: "",
+	zip: ""};
 
 
 // Whenever a user clicks the start button
+//  ***** will need to incorporate the user input validation 
+//  
+
 $("#addressform").on("submit", function() {
 
 	event.preventDefault();
-		var yourAddress = $('#address').val().trim();
-		var yourCity = $('#city').val().trim();
-		var yourZip = $('#zip').val().trim();
 
-	// Find out if someone else is player 1 already
-	// If not, user is player 1 
+	// Find out if someone else is person A already
+	// If not, user is person A 
 	if (personAexists == false) {
+
+		//  call user input validation function here
+
 		you = "A";
-		// Save the new player name in Firebase ref('player' + you).
+		personA.address = $('#address').val().trim();
+		personA.city = $('#city').val().trim();
+		personA.zip = $('#zip').val().trim();
+		// Save the user info in firebase.
 		dataPersonA.set({
-			'p1address': yourAddress,
-			'p1city': yourCity,
-			'p1zip': yourZip
+			'address': personA.address,
+			'city': personA.city,
+			'zip': personA.zip
 			});
 	}
 
-	// If the other person has input first, you are personB
-	// If player one and player two already taken, input form is hidden
+	// If the other person has input first, you are person B
+	// If two people already using, *****hide input form
 	//  and user would not be able to submit form
 	else if ((personAexists == true) && (personBexists == false)) {
+
+		//  call user input validation function here
+
 		you = "B";
+		personB.address = $('#address').val().trim();
+		personB.city = $('#city').val().trim();
+		personB.zip = $('#zip').val().trim();
 
-		// Save the new player name in Firebase ref('player' + you).
+		// Save user info in firebase.
 		dataPersonB.set({
-			'p1address': yourAddress,
-			'p1city': yourCity,
-			'p1zip': yourZip
-			});
-
+			'address': personB.address,
+			'city': personB.city,
+			'zip': personB.zip
+		});
 	};
-
-	// once we have player one and player two, update FB to indicate start of turn 1
-	if (personAexists && personBexists) console.log("full");
 });  //end of submit form event handler
 
 
@@ -344,14 +363,46 @@ $("#addressform").on("submit", function() {
 dataPersonA.on("value", function(snapshot) {
 	if (snapshot.exists()) {
 		personAexists = true;
-		if ((personBexists) && you=="C") {
-			$("#statusDiv").html("<h2> You are a third wheel! </h2>");
+
+		switch(you) {
+		case "A":
+			if (personBexists) {
+				$("#statusDiv").html("");
+				personB = snapshot.val();
+				console.log (personB);
+				fbStatus.set("Start"); //start processing
+			}
+			if (!personBexists) $("#statusDiv").html("<h2> Waiting for Anonymous! </h2>");
+			break;
+		case "B":
+			$("#statusDiv").html("");
+			personA = snapshot.val();
+			console.log (personA);
+
+			fbStatus.set("Start"); //start processing
+			break;
+		case "C":
+			if (personBexists) $("#statusDiv").html("<h2>You are a third wheel!</h2>");
+			// *** Disable Form
+			if (!personBexists) $("#statusDiv").html("<h2> Enter Your Info </h2>");
+			break;
+		default:
+			console.log("error")
 		}
 	}
 	else {
-		$("#statusDiv").html("<h2> waiting for person B </h2>");
 		personAexists = false;
-		$('#statusDiv').html("");
+			switch(you) {
+			case "B":
+				$("#statusDiv").html("<h2> Waiting for Anonymous! </h2>");
+				break;
+			case "C":
+				$("#statusDiv").html("<h2> Enter Your Info </h2>");
+				break;
+			default:
+				console.log("error")
+			};
+		
 	}
 }, function (errorObject) {
   	console.log("The read failed: " + errorObject.code);
@@ -361,20 +412,54 @@ dataPersonA.on("value", function(snapshot) {
 dataPersonB.on("value", function(snapshot) {
 	if (snapshot.exists()) {
 		personBexists = true;
-		if ((personBxists) && you == "C") {
-			$("#statusDiv").html("<h2> You are a third wheel!  </h2>");
+		switch(you) {
+		case "B":
+			if (personAexists) {
+				$("#statusDiv").html(""); 
+				personA = snapshot.val();
+				console.log (personA);
+				fbStatus.set("Start"); //start processing
+			};
+			if (!personAexists) $("#statusDiv").html("<h2> Waiting for Anonymous! </h2>");
+			break;
+		case "A":
+			$("#statusDiv").html("");
+			personB = snapshot.val();
+			console.log (personB);
+			fbStatus.set("Start"); //start processing
+			break;
+		case "C":
+			if (personAexists) $("#statusDiv").html("<h2>You are a third wheel!</h2>");
+			// *** Disable Form
+
+			if (!personAexists) $("#statusDiv").html("<h2> Enter Your Info </h2>");
+			break;
+		default:
+			console.log("error")
 		}
 	}
 	else {
-		$("#statusDiv").html("<h2> waiting for person A </h2>");
 		personBexists = false;
-		$('#statusDiv').html("");
-	}
+		switch(you) {
+			case "A":
+				$("#statusDiv").html("<h2> Waiting for Anonymous! </h2>");
+				break;
+			case "C":
+				$("#statusDiv").html("<h2> Enter Your Info </h2>");
+				break;
+			default:
+				console.log("error")
+			};
+		
+	}		
 }, function (errorObject) {
   	console.log("The read failed: " + errorObject.code);
 });
 
-
+fbStatus.on("value", function(snapshot) {
+	if (snapshot.val()=="Start") console.log("call processing function from here");
+	if (snapshot.val()=='stop') console.log("reset everything");
+});
 
 
 }); // end of document.ready
