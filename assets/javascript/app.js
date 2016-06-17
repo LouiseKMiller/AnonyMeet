@@ -276,6 +276,8 @@ function doDistanceMatrix(){
 				newRow.append("<td id='timeYou'></td>")
 				newRow.append("<td id='distThem'></td>")
 				newRow.append("<td id='timeThem'></td>")
+				newRow.addClass('option');
+				newRow.attr( "data-name", spots[j].name);
 				}
 			}
 
@@ -283,7 +285,9 @@ function doDistanceMatrix(){
 		};
 	}; //end of doDistanceMatrix
 
-
+$('#tableDiv').on('click','.option',function(){
+	$('#name').html($this.data('name'));
+});
 //*****************************************************
 //  FIREBASE RELATED MODULES
 //******************************************************
