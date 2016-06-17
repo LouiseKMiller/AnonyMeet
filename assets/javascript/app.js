@@ -286,7 +286,7 @@ function doDistanceMatrix(){
 	}; //end of doDistanceMatrix
 
 $('#tableDiv').on('click','.option',function(){
-	$('#name').html($this.data('name'));
+	$('#name').html($(this).data('name'));
 });
 //*****************************************************
 //  FIREBASE RELATED MODULES
