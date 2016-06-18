@@ -375,8 +375,8 @@ var request = {
                     newRow.append("<td id='address'></td>")
                     newRow.append("<td id='distYou'></td>")
                     newRow.append("<td id='timeYou'></td>")
-                    newRow.append("<td id='distThem'></td>")
-                    newRow.append("<td id='timeThem'></td>")
+                    // newRow.append("<td id='distThem'></td>")
+                    // newRow.append("<td id='timeThem'></td>")
                     newRow.addClass('option');
                     newRow.attr("data-name", spots[j].name);
                 }
