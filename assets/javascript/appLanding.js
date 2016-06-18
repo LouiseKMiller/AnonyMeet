@@ -10,23 +10,19 @@ var personBexists = false;
 var you = "C";
 
 var data = new Firebase("https://anonymeetut.firebaseio.com/");
-var dataPersonA = new Firebase("https://anonymeetut.firebaseio.com/personA");
-var dataPersonB = new Firebase("https://anonymeetut.firebaseio.com/personB");
-var fbStatus = new Firebase("https://anonymeetut.firebaseio.com/status");
+var fbPeople = new Firebase("https://anonymeetut.firebaseio.com/people");
+var fbPersonA = fbPeople.child('/personA');
 
-var personA = {
-	address: "",
-	city: "",
-	zip: ""};
+var fbPersonB = fbPeople.child('/personB');
+var fbStatus = data.child('/status');
 
-var personB = {
-	address: "",
-	city: "",
-	zip: ""};
+var personA = {};
+
+var personB = {};
 
 
 //  function for user input validation 
-//  
+//  also store result in firebase
 
 var formattedaddress;
 
@@ -48,15 +44,22 @@ function validateAddress(person) {
             formattedaddress = response.formattedaddress;
             }
          if (you=="A") {
-       		 dataPersonA.set({
+       		 fbPersonA.set({
+         	 	'code': person.code,
 				'streetNumber': response.streetnumber,
 				'street': response.street,
 				'city': response.city,
 				'zip': response.postalcode
+			});
+
+var ref = new Firebase("https://anonymeetut.firebaseio.com/");
+ref.orderByChild("code").equalTo(person.code).on("child_added", function(snapshot) {
+  console.log(snapshot.key());
 				})
        		};
          if (you=="B") {
-       		 dataPersonB.set({
+        		fbPersonB.set({
+        		'code': person.code,
 				'streetNumber': response.streetnumber,
 				'street': response.street,
 				'city': response.city,
@@ -67,6 +70,9 @@ function validateAddress(person) {
     	});
 	};
 
+
+
+
 $("#addressform").on("submit", function() {
 
 	event.preventDefault();
@@ -76,9 +82,11 @@ $("#addressform").on("submit", function() {
 	// If not, user is person A 
 	if (personAexists == false) {
 
+		personA.name = $('#name').val().trim();
 		personA.address = $('#address').val().trim();
 		personA.city = $('#city').val().trim();
 		personA.zip = $('#zip').val().trim();
+		personA.code = $('#code').val().trim();
 		you = "A";
 
 		//  call user input validation function here
@@ -92,9 +100,11 @@ $("#addressform").on("submit", function() {
 	else if ((personAexists == true) && (personBexists == false)) {
 
 
+		personB.name = $('#name').val().trim();
 		personB.address = $('#address').val().trim();
 		personB.city = $('#city').val().trim();
 		personB.zip = $('#zip').val().trim();
+		personB.code = $('#code').val().trim();
 		you = "B";
 
 		//  call user input validation function here
@@ -105,7 +115,7 @@ $("#addressform").on("submit", function() {
 
 
 // At the initial load and any change, find out if Person A exists
-dataPersonA.on("value", function(snapshot) {
+fbPersonA.on("value", function(snapshot) {
 	if (snapshot.exists()) {
 		personAexists = true;
 
@@ -156,7 +166,7 @@ dataPersonA.on("value", function(snapshot) {
 	});
 
 // At the initial load and any change, find out if Player 2 exists
-dataPersonB.on("value", function(snapshot) {
+fbPersonB.on("value", function(snapshot) {
 	if (snapshot.exists()) {
 		personBexists = true;
 		switch(you) {
