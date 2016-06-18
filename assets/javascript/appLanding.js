@@ -20,6 +20,7 @@ var personA = {};
 
 var personB = {};
 
+var yourCode;
 
 //  function for user input validation 
 //  also store result in firebase
@@ -45,20 +46,18 @@ function validateAddress(person) {
             }
          if (you=="A") {
        		 fbPersonA.set({
+       		 	'name': person.name,
          	 	'code': person.code,
 				'streetNumber': response.streetnumber,
 				'street': response.street,
 				'city': response.city,
 				'zip': response.postalcode
-			});
-
-var ref = new Firebase("https://anonymeetut.firebaseio.com/");
-ref.orderByChild("code").equalTo(person.code).on("child_added", function(snapshot) {
-  console.log(snapshot.key());
-				})
+				});
        		};
+
          if (you=="B") {
         		fbPersonB.set({
+        		'name': person.name,
         		'code': person.code,
 				'streetNumber': response.streetnumber,
 				'street': response.street,
@@ -67,10 +66,28 @@ ref.orderByChild("code").equalTo(person.code).on("child_added", function(snapsho
 				})
        		};
 
+fbPeople.orderByChild("code").on("child_added", function(newSnapshot) {
+  	var newCode = newSnapshot.val().code;
+  	if (newCode == yourCode) {
+  		console.log ("match found");
+  		}
+    else {
+        console.log("There is no match");
+     	}
+  	});
+
+
+	fbPeople.orderByChild("code").on("child_added", function(snapshot) {
+  		console.log(snapshot.key() + " has " + snapshot.val().code + " code");
+		});
+
+
+
+
+
+
     	});
 	};
-
-
 
 
 $("#addressform").on("submit", function() {
@@ -88,6 +105,7 @@ $("#addressform").on("submit", function() {
 		personA.zip = $('#zip').val().trim();
 		personA.code = $('#code').val().trim();
 		you = "A";
+		yourCode = personA.code;
 
 		//  call user input validation function here
 		// save user info in firebase
@@ -106,6 +124,7 @@ $("#addressform").on("submit", function() {
 		personB.zip = $('#zip').val().trim();
 		personB.code = $('#code').val().trim();
 		you = "B";
+		yourCode = personB.code;
 
 		//  call user input validation function here
 		// Save user info in firebase.
