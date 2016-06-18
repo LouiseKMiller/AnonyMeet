@@ -1,10 +1,10 @@
 var map;
 var geocoder;
 var initialAddressLatLong = {lat: 30.267, lng: -97.744};
-var address1;
-var address2;
-var address1LatLng;
-var address2LatLng;
+// var address1;
+// var address2;
+// var address1LatLng;
+// var address2LatLng;
 
 var latLngPersonA;
 var latLngPersonB;
@@ -30,38 +30,40 @@ function initialize() {
     });
 
     document.getElementById('address1-submit').addEventListener('click', function () {
-        address1 = document.getElementById('address1').value;
-        address2 = document.getElementById('address2').value;
+        // address1 = document.getElementById('address1').value;
+        // address2 = document.getElementById('address2').value;
 
         getAddresFirebase(fbPersonA)
             .then(function (addressA) {
-                console.log(addressA);
+                // console.log(addressA);
                 personAAddress = addressA;
                 return getAddresFirebase(fbPersonB)
             })
             .then(function (addressB) {
-                console.log(addressB);
+                // console.log(addressB);
                 personBAddress = addressB;
             })
-            .catch(function (error) {
-                console.log(error);
-            });
-
-        getLatlngFromAddress(address1)
-            .then(function (latlng) {
-                address1LatLng = latlng;
-                return getLatlngFromAddress(address2);
+            .then(function (getLatlngs) {
+              return getLatlngFromAddress(personAAddress);
             })
-            .then(function (latlng) {
-                address2LatLng = latlng;
+            .then(function (latlngA) {
+                latLngPersonA = latlngA;
+                return getLatlngFromAddress(personBAddress);
+            })
+            .then(function (latlngB) {
+                latLngPersonB = latlngB;
                 // return 'finally';
             })
             .then(function (status) {
-                return calculateMidPoint(address1LatLng, address2LatLng);
+                return calculateMidPoint(latLngPersonA, latLngPersonB);
             })
             .then(function (midPoint) {
-                // console.log(midPoint, 'midpoint')
                 midpoint = midPoint;
+                console.log(personAAddress);
+                console.log(latLngPersonA);
+                console.log(personBAddress);
+                console.log(latLngPersonB);
+                console.log(midpoint, 'midpoint');
             })
             .catch(function (result) {
                 console.log(result);
