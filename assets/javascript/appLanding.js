@@ -28,30 +28,30 @@ var yourCode;
 var formattedaddress;
 
 function validateAddress(person) {
-    var APIKey = 'uv-4dfc13ee82fb54f7c8bd2adde6aa07f4';
-    var countryCode = 'US';
-    person.APIKey = 'uv-4dfc13ee82fb54f7c8bd2adde6aa07f4';   
-   $.ajax({
-        url: 'http://api.address-validator.net/api/verify' + "?StreetAddress=" + person.address + "&City=" + person.city + "&PostalCode=" + person.zip + "&CountryCode=" + countryCode + "&APIKey=" + person.APIKey,
-        type: 'GET',
-        data: person,
-        dataType: 'json'
-    	})
+  //  var APIKey = 'uv-4dfc13ee82fb54f7c8bd2adde6aa07f4';
+  //  var countryCode = 'US';
+  //  person.APIKey = 'uv-4dfc13ee82fb54f7c8bd2adde6aa07f4';   
+   // $.ajax({
+   //      url: 'http://api.address-validator.net/api/verify' + "?StreetAddress=" + person.address + "&City=" + person.city + "&PostalCode=" + person.zip + "&CountryCode=" + countryCode + "&APIKey=" + person.APIKey,
+   //      type: 'GET',
+   //      data: person,
+   //      dataType: 'json'
+   //  	})
 
-   // wait until you get the response
-    .done(function(response) {
-        if (typeof(response.status) != "undefined") {
-            status = response.status;
-            formattedaddress = response.formattedaddress;
-            }
+   // // wait until you get the response
+   //  .done(function(response) {
+   //      if (typeof(response.status) != "undefined") {
+   //          status = response.status;
+   //          formattedaddress = response.formattedaddress;
+   //          }
          if (you=="A") {
        		 fbPersonA.set({
        		 	'name': person.name,
          	 	'code': person.code,
-				'streetNumber': response.streetnumber,
-				'street': response.street,
-				'city': response.city,
-				'zip': response.postalcode
+				'streetNumber': person.streetnumber,
+				'street': person.street,
+				'city': person.city,
+				'zip': person.postalcode
 				});
        		};
 
@@ -59,10 +59,10 @@ function validateAddress(person) {
         		fbPersonB.set({
         		'name': person.name,
         		'code': person.code,
-				'streetNumber': response.streetnumber,
-				'street': response.street,
-				'city': response.city,
-				'zip': response.postalcode
+				'streetNumber': person.streetnumber,
+				'street': person.street,
+				'city': person.city,
+				'zip': person.postalcode
 				})
        		};
 

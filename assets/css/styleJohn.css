@@ -91,6 +91,18 @@ body {
     box-shadow: 0px 0px 5px 0px rgba(0, 0, 0, 0.39);
 }
 
+#statusDiv {
+    padding: 10px;
+    font-size: 40px;
+    text-align: center;
+    margin: 30px auto;
+    width: 300px;
+    background-color: #eeeeee;
+    font-family: "HelveticaNeue-Light", "Helvetica Neue Light", "Helvetica Neue", Helvetica, Arial, "Lucida Grande", sans-serif;
+    font-weight: 300;
+    border-radius: 15px;
+}
+
 #map {
     height: 80%;
     background-color: #FF0000;
